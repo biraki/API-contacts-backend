@@ -7,5 +7,6 @@ type TUser = z.infer<typeof userSchema>
 type TUserResponse = z.infer<typeof userSchemaResponse>
 type TUsersResponse = z.infer<typeof usersSchemaResponse>
 type TUserUpdateRequest = DeepPartial<TUserRequest>
+// type TUserUpdateRequest = z.infer<typeof userSchemaUpdate>
 
 export { TUser, TUserRequest, TUserResponse, TUsersResponse, TUserUpdateRequest }

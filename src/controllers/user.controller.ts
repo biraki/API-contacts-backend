@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { TUserUpdateRequest } from "../interfaces/user.interface";
+import { AppDataSource } from "../data-source";
+import { User } from "../entities/users.entity";
+import { createReadStream } from "fs";
+const { PDFDocument } = require('pdf-lib');
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -29,5 +33,15 @@ export class UserController {
     await this.userService.remove(userId);
     return res.status(204).send();
   }
+
+  async generatePdf(req: Request, res: Response) {
+    const isSuperUser = res.locals.superUser || false
+    const userId = res.locals.userId || "4b98aef3-8ff9-47f9-891f-f8dde59af6fc"
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=user_contacts.pdf');
+    const users = await this.userService.getPdf(isSuperUser, userId);
+    return res.end(users, "binary")
+  }
+
 }
 

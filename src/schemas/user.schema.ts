@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { contactSchema } from "./contact.schema";
 
 const userSchema = z.object({
   id: z.string(),
@@ -10,6 +11,7 @@ const userSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date().nullable(),
   updatedBy: z.string().nullable(),
+  contacts: z.array(contactSchema)
 });
 
 const userSchemaRequest = userSchema.omit({
@@ -18,6 +20,7 @@ const userSchemaRequest = userSchema.omit({
   registeredAt: true,
   updatedAt: true,
   updatedBy: true,
+  contacts:true
 });
 
 const userSchemaResponse = userSchema.omit({
@@ -29,6 +32,7 @@ const usersSchemaResponse = z.array(userSchemaResponse);
 const userSchemaUpdate = userSchema
   .omit({
     id: true,
+    contacts: true
   })
   .partial();
 

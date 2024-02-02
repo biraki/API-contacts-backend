@@ -30,3 +30,4 @@ userRouter.delete(
   ensureIsAccounttOwnerMiddleware,
   (req, res) => userController.remove(req, res)
 );
+userRouter.get("/pdf", ensureAuthMiddleware, getDataFromToken, ensureIsAccounttOwnerMiddleware, (req, res) => userController.generatePdf(req, res))
