@@ -1,25 +1,25 @@
-import path from "node:path"
-import { DataSource, DataSourceOptions } from "typeorm";
-import "dotenv/config"
+import 'reflect-metadata'
+import 'dotenv/config' 
+import { DataSource, DataSourceOptions } from 'typeorm'
+import path from 'path'
 
-const DataSourceConfig = () : DataSourceOptions => {
-    const entitiesPath = path.join(__dirname, "entities/**.{js, ts}")
-    const migrationsPath = path.join(__dirname, "migrations/**.{js, ts}")
+const dataSourceConfig = (): DataSourceOptions => {
+  const entityPath: string = path.join(__dirname, './entities/**.{ts,js}')
+  const migrationPath: string = path.join(__dirname, './migrations/**.{ts,js}')
 
-    if(!process.env.DATABASE_URL) {
-        throw new Error("Env var DATABASE_URL does not exist")
-    }
 
-    return {
-        type: "postgres",
-        url: process.env.DATABASE_URL,
-        synchronize: false,
-        logging: true,
-        entities: [entitiesPath],
-        migrations: [migrationsPath]
-    }
+  const dbUrl: string | undefined = process.env.DATABASE_URL
+
+  if(!dbUrl) {
+    throw new Error('Missing env: var "DATABASE_URL"')
+  }
+
+  return {
+    type: "postgres",
+    url: dbUrl,
+    entities: [entityPath],
+    migrations: [migrationPath]
+  }
 }
 
-const AppDataSource = new DataSource(DataSourceConfig())
-
-export { AppDataSource }
+export const AppDataSource = new DataSource(dataSourceConfig())
