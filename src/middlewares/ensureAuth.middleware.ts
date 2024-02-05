@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 
 export const ensureAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    
     const headerTokenData = req.headers.authorization
 
     if (!headerTokenData) {

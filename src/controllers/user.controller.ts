@@ -7,6 +7,7 @@ import { createReadStream } from "fs";
 import { PDFDocument } from 'pdf-lib';
 import fs from 'fs';
 import doc from "pdfkit";
+import { AppError } from "../errors/AppError";
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -38,7 +39,8 @@ export class UserController {
 
   async generatePdf(req: Request, res: Response) {
     const isSuperUser = res.locals.superUser || false
-    const userId = req.params.id
+  
+    const userId = req.params.id || res.locals.userId
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=user_contacts.pdf');
     const users = await this.userService.getPdf(isSuperUser, userId);

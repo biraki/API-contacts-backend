@@ -9,10 +9,11 @@ export const ensureIsAccounttOwnerMiddleware = async (
   next: NextFunction
 ) => {
   const userRepository = AppDataSource.getRepository(User);
-
+  
   const userParamId = req.params.id;
   const userId = res.locals.userId;
   const superUser = res.locals.superUser;
+
   const user = await userRepository.findOne({
     where: {
       id: userParamId,
@@ -24,11 +25,12 @@ export const ensureIsAccounttOwnerMiddleware = async (
   }
 
   if (!superUser) {
-    if (user.id !== userId) {
-      throw new AppError("Insufficient permissions", 403);
+    if(userParamId){
+      if (user.id !== userId) {
+        throw new AppError("Insufficient permissions", 403);
+      }
+      return next();
     }
-    return next();
   }
-
   return next();
 };

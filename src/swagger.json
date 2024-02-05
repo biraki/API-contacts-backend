@@ -16,10 +16,50 @@
         }
     ],
     "paths": {
-        "/users": {
+        "/users/:userId?": {
             "get": {
                 "description": "Rota responsável por buscar todos os usuários cadastrados caso seja admin, caso contrario traz a informação do usuário logado",
-                "tags": ["Rota autenticada"],
+                "tags": [],
+                "responses": {
+                    "200": {
+                        "description": "Sem parâmetros",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array"
+                                },
+                                "examples": {
+                                    "responses": {
+                                        "value": {
+                                            "id": "aa993cc7-0808-4dd0-8c40-69803dbb2763",
+                                            "email": "felipee@mail.com",
+                                            "name": "felipeee",
+                                            "superUser": false,
+                                            "phone": "12314",
+                                            "createdAt": "2024-02-05T16:10:41.644Z",
+                                            "updatedAt": "2024-02-05T16:11:55.145Z",
+                                            "updatedBy": "felipe"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } 
+                },
+                "security":[{}]            
+            },            
+            "post": { 
+                "description": "Rota responsável por cadastrar os dados do usuário",
+                "tags": ["Rota sem parâmetros"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schema/createUser"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -30,15 +70,24 @@
                                 },
                                 "examples": {
                                     "responses": {
-                                        "value": {}
+                                        "value": {
+                                            "id": "aa993cc7-0808-4dd0-8c40-69803dbb2763",
+                                            "email": "felipee@mail.com",
+                                            "name": "felipeee",
+                                            "superUser": false,
+                                            "phone": "12314",
+                                            "createdAt": "2024-02-05T16:10:41.644Z",
+                                            "updatedAt": "2024-02-05T16:11:55.145Z",
+                                            "updatedBy": "felipe"
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                }
-            },
-            "post": {}
+                    } 
+                },
+                "security":[{}] 
+            }
         },
         "/users/:id": {
             "patch": {},

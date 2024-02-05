@@ -143,85 +143,76 @@ export class UserService {
   }
 
   async getPdf(isSuperUser: boolean, userId: string) {
+
     const userRepository = AppDataSource.getRepository(User);
-
-    try {
-      let users;
-
-      if (userId) {
-        const user = await userRepository.findOne({
-          where: {
-            id: userId,
-          },
-          relations: {
-            contacts: true,
-          },
-        });
-        if (!user) {
-          throw new AppError("User not found", 404);
-        }
-
-        users = [user];
+    let users: User[] = [];
+    if (userId) {
+      const user = await userRepository.findOne({
+        where: {
+          id: userId,
+        },
+        relations: {
+          contacts: true,
+        },
+      });
+      if (!user) {
+        throw new AppError("User not found", 404);
       }
-      if (!userId && isSuperUser) {
-        users = await userRepository.find({
-          relations: {
-            contacts: true,
-          },
-        });
-      }
+      users.push(user);
+    }
 
-      // Cria um novo documento PDF
+    if (!userId && isSuperUser) {
+      const users = await userRepository.find({
+        relations: {
+          contacts: true,
+        },
+      });
+    }
 
-      // Adiciona uma nova página ao documento
-      const pdfDoc = new jsPDF({ orientation: "p" });
+    const pdfDoc = new jsPDF({ orientation: "p" });
 
-      users!.forEach(async (user) => {
-        pdfDoc.addPage();
-        pdfDoc.setFontSize(10);
-        pdfDoc.setFont("times");
-        pdfDoc.setTextColor("#232020");
-        pdfDoc.text(`Name: ${user?.name}`, 10, 10);
-        pdfDoc.text(`Email: ${user?.email}`, 10, 20);
-        pdfDoc.text(`Contatos:`, 10, 30);
-        let y = 40;
-        let count = 0;
-        user?.contacts.map((contact) => {
-          for (const [key, value] of Object.entries(contact)) {
-            if (count == 6) {
-              pdfDoc.addPage();
-              count = -1;
-              y = 10;
-            }
-            if (
-              key == "name" ||
-              key == "phone" ||
-              key == "optionalPhone" ||
-              key == "email" ||
-              key == "optionalEmail" ||
-              key == "status"
-            ) {
-              pdfDoc.text(`${key}: ${value}`, 10, y);
-              y += 5;
-              if (key == "status") {
-                y += 10;
-              }
+    users.forEach(async (user) => {
+      pdfDoc.addPage();
+      pdfDoc.setFontSize(10);
+      pdfDoc.setFont("times");
+      pdfDoc.setTextColor("#232020");
+      pdfDoc.text(`Name: ${user?.name}`, 10, 10);
+      pdfDoc.text(`Email: ${user?.email}`, 10, 20);
+      pdfDoc.text(`Contatos:`, 10, 30);
+      let y = 40;
+      let count = 0;
+      user?.contacts.map((contact) => {
+        for (const [key, value] of Object.entries(contact)) {
+          if (count == 6) {
+            pdfDoc.addPage();
+            count = -1;
+            y = 10;
+          }
+          if (
+            key == "name" ||
+            key == "phone" ||
+            key == "optionalPhone" ||
+            key == "email" ||
+            key == "optionalEmail" ||
+            key == "status"
+          ) {
+            pdfDoc.text(`${key}: ${value}`, 10, y);
+            y += 5;
+            if (key == "status") {
+              y += 10;
             }
           }
+        }
 
-          count += 1;
-        });
-
-        // Converte o documento PDF para bytes
+        count += 1;
       });
-      pdfDoc.deletePage(1);
-      const pdfBytes = pdfDoc.output("arraybuffer");
-      const pdf = new Blob([pdfBytes], { type: "application/pdf" });
 
-      return await pdf.text();
-    } catch (error) {
-      console.error("Error to generate PDF:", error);
-      throw new AppError("Internal Server Error");
-    }
+      // Converte o documento PDF para bytes
+    });
+    pdfDoc.deletePage(1);
+    const pdfBytes = pdfDoc.output("arraybuffer");
+    const pdf = new Blob([pdfBytes], { type: "application/pdf" });
+
+    return await pdf.text();
   }
 }
