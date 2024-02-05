@@ -83,6 +83,19 @@ export class ContactService {
     return contactsSchemaResponse.parse(contacts);
   }
 
+  async listById(
+    contactId: string
+  ): Promise<TContact> {
+    const contactRepository = AppDataSource.getRepository(Contact);
+    const contactToRetrieve = await contactRepository.findOneBy({
+      id: contactId,
+    });
+    if (!contactToRetrieve) {
+      throw new AppError("Contact not found", 404);
+    }
+    return contactSchema.parse(contactToRetrieve)
+  }
+
   async update(
     data: TContactUpdateRequest,
     contactId: string,

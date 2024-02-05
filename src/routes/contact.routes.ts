@@ -14,23 +14,23 @@ export const contactRouter = Router();
 contactRouter.use(ensureAuthMiddleware, getDataFromToken);
 contactRouter.post(
   "",
-  ensureAuthMiddleware,
   ensureDataIsValidMiddleware(contactSchemaRequest),
   (req: Request, res: Response) => contactController.create(req, res)
 );
-contactRouter.get("", (req, res) => contactController.list(req, res));
+contactRouter.get("", ensureAuthMiddleware, (req, res) =>
+  contactController.list(req, res)
+);
+contactRouter.get("/:id", ensureIsContactOwnerMiddleware, (req, res) =>
+  contactController.listByid(req, res)
+);
 contactRouter.patch(
   "/:id",
-  ensureAuthMiddleware,
-  getDataFromToken,
   ensureIsContactOwnerMiddleware,
   ensureDataIsValidMiddleware(contactSchemaUpdate),
   (req, res) => contactController.update(req, res)
 );
 contactRouter.delete(
   "/:id",
-  ensureAuthMiddleware,
-  getDataFromToken,
   ensureIsContactOwnerMiddleware,
   (req, res) => contactController.remove(req, res)
 );

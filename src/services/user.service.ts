@@ -7,13 +7,11 @@ import {
   TUserUpdateRequest,
 } from "../interfaces/user.interface";
 import {
-
   userSchemaResponse,
   usersSchemaResponse,
 } from "../schemas/user.schema";
 import { AppError } from "../errors/AppError";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { writeFileSync } from "fs";
+import jsPDF from "jspdf";
 
 export class UserService {
   async create(data: TUserRequest): Promise<TUserResponse> {
@@ -57,7 +55,7 @@ export class UserService {
 
   async list(isSuperUser: boolean, userId: string) {
     const userRepository = AppDataSource.getRepository(User);
-    if (!isSuperUser) {
+    if (userId) {
       const user = await userRepository.findOne({
         where: {
           id: userId,
@@ -68,12 +66,16 @@ export class UserService {
       });
       return userSchemaResponse.parse(user);
     }
-    const users = await userRepository.find({
-      relations: {
-        contacts: true,
-      },
-    });
-    return usersSchemaResponse.parse(users);
+    if (!userId && isSuperUser) {
+      const users = await userRepository.find({
+        relations: {
+          contacts: true,
+        },
+      });
+      return usersSchemaResponse.parse(users);
+    }
+
+    throw new AppError("Insufficient permissions", 403);
   }
 
   async update(
@@ -83,13 +85,13 @@ export class UserService {
   ): Promise<TUserResponse> {
     const userRepository = AppDataSource.getRepository(User);
     const userToUpdate = await userRepository.findOne({
-      where: {id: userId},
+      where: { id: userId },
       relations: {
         contacts: true,
       },
-    },);
+    });
     if (!userToUpdate) {
-      throw new AppError("Contact not found", 404);
+      throw new AppError("User not found", 404);
     }
 
     for (var info in data) {
@@ -135,7 +137,7 @@ export class UserService {
       id: userId,
     });
     if (!userToDelete) {
-      throw new AppError("Contact not found", 404);
+      throw new AppError("User not found", 404);
     }
     await userRepository.remove(userToDelete);
   }
@@ -146,7 +148,7 @@ export class UserService {
     try {
       let users;
 
-      if (!isSuperUser) {
+      if (userId) {
         const user = await userRepository.findOne({
           where: {
             id: userId,
@@ -155,9 +157,13 @@ export class UserService {
             contacts: true,
           },
         });
+        if (!user) {
+          throw new AppError("User not found", 404);
+        }
 
         users = [user];
-      } else {
+      }
+      if (!userId && isSuperUser) {
         users = await userRepository.find({
           relations: {
             contacts: true,
@@ -166,48 +172,53 @@ export class UserService {
       }
 
       // Cria um novo documento PDF
-      const pdfDoc = await PDFDocument.create();
 
       // Adiciona uma nova página ao documento
-      const page = pdfDoc.addPage();
+      const pdfDoc = new jsPDF({ orientation: "p" });
 
-      
-      // Adiciona os dados dos usuários à página
+      users!.forEach(async (user) => {
+        pdfDoc.addPage();
+        pdfDoc.setFontSize(10);
+        pdfDoc.setFont("times");
+        pdfDoc.setTextColor("#232020");
+        pdfDoc.text(`Name: ${user?.name}`, 10, 10);
+        pdfDoc.text(`Email: ${user?.email}`, 10, 20);
+        pdfDoc.text(`Contatos:`, 10, 30);
+        let y = 40;
+        let count = 0;
+        user?.contacts.map((contact) => {
+          for (const [key, value] of Object.entries(contact)) {
+            if (count == 6) {
+              pdfDoc.addPage();
+              count = -1;
+              y = 10;
+            }
+            if (
+              key == "name" ||
+              key == "phone" ||
+              key == "optionalPhone" ||
+              key == "email" ||
+              key == "optionalEmail" ||
+              key == "status"
+            ) {
+              pdfDoc.text(`${key}: ${value}`, 10, y);
+              y += 5;
+              if (key == "status") {
+                y += 10;
+              }
+            }
+          }
 
-      // const text = users
-      //   .map((user) => {
-      //     return `Nome: ${user!.name}, Email: ${
-      //       user!.email
-      //     }, Contacts: ${JSON.stringify(user!.contacts)}`;
-      //   })
-      //   .join("\n");
-            const text = users
-            .map((user) => {
-          if (!user){return }
-          return `Nome: ${user.name}, Email: ${
-            user.email
-          }, Contacts: ${(user.contacts.map((info) => {
-            return `Nome: ${info.name}, Email: ${info.email}, Optional Email: ${info.optionalEmail},
-             Phone: ${info.phone}, Optional Phone: ${info.optionalPhone}, Since: ${info.registeredAt},`
-          }) )}`;
-        })
-        .join("\n");
-      const { width, height } = page.getSize()
-      const fontSize = 10
-      const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman)
-      page.drawText(text, {
-        x: 50,
-        y: height - 4 * fontSize,
-        maxWidth: 100,
-        size: fontSize,
-        font: timesRomanFont,
-        color: rgb(0.35, 0.32, 0.32),
-      })
+          count += 1;
+        });
 
-      // Converte o documento PDF para bytes
-      const pdfBytes = await pdfDoc.save();
-      writeFileSync('usuarios.pdf', pdfBytes);
-      return pdfBytes;
+        // Converte o documento PDF para bytes
+      });
+      pdfDoc.deletePage(1);
+      const pdfBytes = pdfDoc.output("arraybuffer");
+      const pdf = new Blob([pdfBytes], { type: "application/pdf" });
+
+      return await pdf.text();
     } catch (error) {
       console.error("Error to generate PDF:", error);
       throw new AppError("Internal Server Error");

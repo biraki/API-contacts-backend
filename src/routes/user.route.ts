@@ -13,7 +13,7 @@ userRouter.post(
   ensureDataIsValidMiddleware(userSchemaRequest),
   (req: Request, res: Response) => userController.create(req, res)
 );
-userRouter.get("", ensureAuthMiddleware, getDataFromToken, (req, res) =>
+userRouter.get("/:id?", ensureAuthMiddleware, getDataFromToken, (req, res) =>
   userController.list(req, res)
 );
 userRouter.patch(
@@ -31,4 +31,4 @@ userRouter.delete(
   ensureIsAccounttOwnerMiddleware,
   (req, res) => userController.remove(req, res)
 );
-userRouter.get("/pdf", ensureAuthMiddleware, getDataFromToken, ensureIsAccounttOwnerMiddleware, (req, res) => userController.generatePdf(req, res))
+userRouter.get("/pdf/:id?", ensureAuthMiddleware, getDataFromToken, ensureIsAccounttOwnerMiddleware, (req, res) => userController.generatePdf(req, res))

@@ -13,7 +13,6 @@ export const ensureIsAccounttOwnerMiddleware = async (
   const userParamId = req.params.id;
   const userId = res.locals.userId;
   const superUser = res.locals.superUser;
-
   const user = await userRepository.findOne({
     where: {
       id: userParamId,
