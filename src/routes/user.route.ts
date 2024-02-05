@@ -27,6 +27,7 @@ userRouter.patch(
 userRouter.delete(
   "/:id",
   ensureAuthMiddleware,
+  getDataFromToken,
   ensureIsAccounttOwnerMiddleware,
   (req, res) => userController.remove(req, res)
 );

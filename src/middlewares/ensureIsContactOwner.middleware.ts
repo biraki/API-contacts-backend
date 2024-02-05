@@ -14,6 +14,7 @@ export const ensureIsContactOwnerMiddleware = async (
   const userId = res.locals.userId;
   const superUser = res.locals.superUser;
 
+
   const contact = await contactRepository.findOne({
     where: {
       id: contactId,

@@ -13,7 +13,8 @@
       "skipLibCheck": true,
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
-      "strictPropertyInitialization": false
+      "strictPropertyInitialization": false,
+      "resolveJsonModule": true,
   },
   "include": [
       "src"

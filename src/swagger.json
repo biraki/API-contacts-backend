@@ -1,0 +1,286 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "User contacts API",
+        "description": "API para armazernar o contato de clientes",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "Development env"
+        },
+        {
+            "url": "https://onrender-clientes-api.com",
+            "description": "production env"
+        }
+    ],
+    "paths": {
+        "/users": {
+            "get": {
+                "description": "Rota responsável por buscar todos os usuários cadastrados caso seja admin, caso contrario traz a informação do usuário logado",
+                "tags": ["Rota autenticada"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array"
+                                },
+                                "examples": {
+                                    "responses": {
+                                        "value": {}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {}
+        },
+        "/users/:id": {
+            "patch": {},
+            "delete": {}
+        },
+        "/users/pdf": {
+            "get": {}
+        },
+        "/login": {
+            "post": {}
+        },
+        "/contacts": {
+            "get": {},
+            "post": {}
+        },
+        "/contacts/:id": {
+            "patch": {},
+            "delete": {}
+        }
+    },
+    "components": {
+        "schemas": {
+            "createUser": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    }
+                }
+            },
+            "getUser": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "superUser": {
+                        "type": "boolean"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "updatedBy": {
+                        "type": "string"
+                    },
+                    "contacts": {
+                        "type": "array"
+                    }
+
+                }
+            },
+            "getUsers": {
+                "type": "array",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "superUser": {
+                        "type": "boolean"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "updatedBy": {
+                        "type": "string"
+                    },
+                    "contacts": {
+                        "type": "array"
+                    }
+
+                }
+            },
+            "updateUser": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    }
+                }
+            },
+            "createContact": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "optionalEmail": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "optionalPhone": {
+                        "type": "string"
+                    }
+                }
+            },
+            "getContact": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "optionalEmail": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "optionalPhone": {
+                        "type": "string"
+                    },
+                    "registeredAt": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "updatedBy": {
+                        "type": "string"
+                    }
+                }
+            },
+            "getContacts": {
+                "type": "array",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "optionalEmail": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "optionalPhone": {
+                        "type": "string"
+                    },
+                    "registeredAt": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "updatedBy": {
+                        "type": "string"
+                    }
+                }
+            },
+            "updateContact": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "optionalEmail": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "optionalPhone": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "security": []
+}

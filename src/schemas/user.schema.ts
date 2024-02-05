@@ -10,8 +10,7 @@ const userSchema = z.object({
   phone: z.string(),
   createdAt: z.date(),
   updatedAt: z.date().nullable(),
-  updatedBy: z.string().nullable(),
-  contacts: z.array(contactSchema)
+  updatedBy: z.string().nullable()
 });
 
 const userSchemaRequest = userSchema.omit({
@@ -32,7 +31,11 @@ const usersSchemaResponse = z.array(userSchemaResponse);
 const userSchemaUpdate = userSchema
   .omit({
     id: true,
-    contacts: true
+    contacts: true,
+    superUser: true,
+    createdAt: true,
+    updatedAt: true,
+    updatedBy: true
   })
   .partial();
 

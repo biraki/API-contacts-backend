@@ -62,7 +62,7 @@ export class ContactService {
   }
 
   async list(userId: string, isSuperUser: boolean): Promise<TContactsResponse> {
-    console.log(isSuperUser)
+
     if (!isSuperUser) {
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({

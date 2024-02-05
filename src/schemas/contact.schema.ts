@@ -25,6 +25,9 @@ const contactSchemaRequest = contactSchema.omit({
 const contactSchemaUpdate = contactSchema
   .omit({
     id: true,
+    registeredAt: true,
+    updatedAt: true,
+    updatedBy: true
   })
   .partial();
 
