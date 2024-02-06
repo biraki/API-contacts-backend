@@ -10,7 +10,8 @@ const userSchema = z.object({
   phone: z.string(),
   createdAt: z.date(),
   updatedAt: z.date().nullable(),
-  updatedBy: z.string().nullable()
+  updatedBy: z.string().nullable(),
+  contacts: z.array(contactSchema)
 });
 
 const userSchemaRequest = userSchema.omit({
@@ -35,9 +36,15 @@ const userSchemaUpdate = userSchema
     superUser: true,
     createdAt: true,
     updatedAt: true,
-    updatedBy: true
+    updatedBy: true,
   })
   .partial();
+
+  const userSchemaUpdateResponse = userSchema.omit({
+      contacts: true,
+    })
+
+
 
   const userSchemaRecoverPassword = userSchema.omit({
     id: true,
@@ -55,5 +62,6 @@ export {
   userSchemaResponse,
   usersSchemaResponse,
   userSchemaUpdate,
-  userSchemaRecoverPassword
+  userSchemaRecoverPassword,
+  userSchemaUpdateResponse
 };

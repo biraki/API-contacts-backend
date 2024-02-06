@@ -41,15 +41,15 @@ export class ContactService {
     });
 
     if (foundContactByEmail && foundContactByPhone) {
-      throw new AppError("Email and phone already exist");
+      throw new AppError("Email and phone already exist",409);
     }
 
     if (foundContactByEmail) {
-      throw new AppError("Email already exists");
+      throw new AppError("Email already exists",409);
     }
 
     if (foundContactByPhone) {
-      throw new AppError("Phone already exists");
+      throw new AppError("Phone already exists",409);
     }
 
     const task = contactRepository.create({
@@ -117,7 +117,7 @@ export class ContactService {
           },
         });
         if (foundContact) {
-          throw new AppError("Email already exists");
+          throw new AppError("Email already exists",409);
         }
       } else if (info == "phone") {
         const foundContact = await contactRepository.findOne({
@@ -126,7 +126,7 @@ export class ContactService {
           },
         });
         if (foundContact) {
-          throw new AppError("Phone already exists");
+          throw new AppError("Phone already exists",409);
         }
       }
     }

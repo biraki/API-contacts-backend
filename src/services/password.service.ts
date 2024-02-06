@@ -29,7 +29,7 @@ export class RecoverPasswordService {
     });
 
     if (!foundUser) {
-      throw new AppError("Email not found", 403);
+      throw new AppError("Email not found", 404);
     }
 
     const token = sign({ email: email }, process.env.SECRET_KEY!, {

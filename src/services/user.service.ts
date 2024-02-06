@@ -5,9 +5,11 @@ import {
   TUserRequest,
   TUserResponse,
   TUserUpdateRequest,
+  TUserUpdateResponse,
 } from "../interfaces/user.interface";
 import {
   userSchemaResponse,
+  userSchemaUpdateResponse,
   usersSchemaResponse,
 } from "../schemas/user.schema";
 import { AppError } from "../errors/AppError";
@@ -30,7 +32,7 @@ export class UserService {
     });
 
     if (foundUserByEmail && foundUserByPhone) {
-      throw new AppError("Email and phone already exist");
+      throw new AppError("Email and phone already exist", 409);
     }
 
     if (foundUserByEmail) {
@@ -53,42 +55,38 @@ export class UserService {
     return userSchemaResponse.parse(user);
   }
 
-  async list(isSuperUser: boolean, userId: string) {
+  async list() {
     const userRepository = AppDataSource.getRepository(User);
-    if (userId) {
-      const user = await userRepository.findOne({
-        where: {
-          id: userId,
-        },
-        relations: {
-          contacts: true,
-        },
-      });
-      return userSchemaResponse.parse(user);
-    }
-    if (!userId && isSuperUser) {
-      const users = await userRepository.find({
-        relations: {
-          contacts: true,
-        },
-      });
-      return usersSchemaResponse.parse(users);
-    }
+    const users = await userRepository.find({
+      relations: {
+        contacts: true,
+      },
+    });
+    return usersSchemaResponse.parse(users);
+  }
 
-    throw new AppError("Insufficient permissions", 403);
+  async listById(userId: string): Promise<TUserResponse> {
+    const userRepository = AppDataSource.getRepository(User);
+    const userFound = await userRepository.findOne({
+      where: { id: userId },
+      relations: {
+        contacts: true,
+      },
+    });
+    if (!userFound) {
+      throw new AppError("User not found", 404);
+    }
+    return userSchemaResponse.parse(userFound);
   }
 
   async update(
     data: TUserUpdateRequest,
     userId: string,
     username: string
-  ): Promise<TUserResponse> {
+  ): Promise<TUserUpdateResponse> {
     const userRepository = AppDataSource.getRepository(User);
     const userToUpdate = await userRepository.findOne({
-      where: { id: userId },
-      relations: {
-        contacts: true,
-      },
+      where: { id: userId }
     });
     if (!userToUpdate) {
       throw new AppError("User not found", 404);
@@ -128,7 +126,7 @@ export class UserService {
       updatedAt: new Date(),
     });
     await userRepository.save(updatedUserData);
-    return userSchemaResponse.parse(updatedUserData);
+    return userSchemaUpdateResponse.parse(updatedUserData);
   }
 
   async remove(userId: string): Promise<void> {
@@ -142,8 +140,63 @@ export class UserService {
     await userRepository.remove(userToDelete);
   }
 
-  async getPdf(isSuperUser: boolean, userId: string) {
+  async getPdf() {
+    const userRepository = AppDataSource.getRepository(User);
+    const users = await userRepository.find({
+      relations: {
+        contacts: true,
+      },
+    });
 
+    const pdfDoc = new jsPDF({ orientation: "p" });
+
+    users.forEach(async (user) => {
+      pdfDoc.addPage();
+      pdfDoc.setFontSize(10);
+      pdfDoc.setFont("times");
+      pdfDoc.setTextColor("#232020");
+      pdfDoc.text(`Name: ${user?.name}`, 10, 10);
+      pdfDoc.text(`Email: ${user?.email}`, 10, 20);
+      pdfDoc.text(`Phone: ${user?.phone}`, 10, 30);
+      pdfDoc.text(`Contatos:`, 10, 40);
+      let y = 50;
+      let count = 0;
+      user?.contacts.map((contact) => {
+        for (const [key, value] of Object.entries(contact)) {
+          if (count == 6) {
+            pdfDoc.addPage();
+            count = -1;
+            y = 10;
+          }
+          if (
+            key == "name" ||
+            key == "phone" ||
+            key == "optionalPhone" ||
+            key == "email" ||
+            key == "optionalEmail" ||
+            key == "status"
+          ) {
+            pdfDoc.text(`${key}: ${value}`, 10, y);
+            y += 5;
+            if (key == "status") {
+              y += 10;
+            }
+          }
+        }
+
+        count += 1;
+      });
+
+      // Converte o documento PDF para bytes
+    });
+    pdfDoc.deletePage(1);
+    const pdfBytes = pdfDoc.output("arraybuffer");
+    const pdf = new Blob([pdfBytes], { type: "application/pdf" });
+
+    return await pdf.text();
+  }
+
+  async getPdfById(userId: string) {
     const userRepository = AppDataSource.getRepository(User);
     let users: User[] = [];
     if (userId) {
@@ -161,14 +214,6 @@ export class UserService {
       users.push(user);
     }
 
-    if (!userId && isSuperUser) {
-      const users = await userRepository.find({
-        relations: {
-          contacts: true,
-        },
-      });
-    }
-
     const pdfDoc = new jsPDF({ orientation: "p" });
 
     users.forEach(async (user) => {
@@ -178,8 +223,9 @@ export class UserService {
       pdfDoc.setTextColor("#232020");
       pdfDoc.text(`Name: ${user?.name}`, 10, 10);
       pdfDoc.text(`Email: ${user?.email}`, 10, 20);
-      pdfDoc.text(`Contatos:`, 10, 30);
-      let y = 40;
+      pdfDoc.text(`Phone: ${user?.phone}`, 10, 30);
+      pdfDoc.text(`Contatos:`, 10, 40);
+      let y = 50;
       let count = 0;
       user?.contacts.map((contact) => {
         for (const [key, value] of Object.entries(contact)) {
