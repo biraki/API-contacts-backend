@@ -1,13 +1,7 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { TUserUpdateRequest } from "../interfaces/user.interface";
-import { AppDataSource } from "../data-source";
-import { User } from "../entities/users.entity";
-import { createReadStream } from "fs";
-import { PDFDocument } from "pdf-lib";
-import fs from "fs";
-import doc from "pdfkit";
-import { AppError } from "../errors/AppError";
+
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -29,11 +23,11 @@ export class UserController {
   async update(req: Request, res: Response) {
     const userId = req.params.id;
     const userData: TUserUpdateRequest = req.body;
-    const username: string = res.locals.username;
+    const tokenId: string = res.locals.userId;
     const updatedContact = await this.userService.update(
       userData,
       userId,
-      username
+      tokenId
     );
     return res.json(updatedContact);
   }

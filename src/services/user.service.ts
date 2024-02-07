@@ -50,6 +50,7 @@ export class UserService {
       superUser,
       password: hashedPassword,
       phone,
+      contacts:[]
     });
     await userRepository.save(user);
     return userSchemaResponse.parse(user);
@@ -82,7 +83,7 @@ export class UserService {
   async update(
     data: TUserUpdateRequest,
     userId: string,
-    username: string
+    tokenId: string
   ): Promise<TUserUpdateResponse> {
     const userRepository = AppDataSource.getRepository(User);
     const userToUpdate = await userRepository.findOne({
@@ -122,7 +123,7 @@ export class UserService {
     const updatedUserData = userRepository.create({
       ...userToUpdate,
       ...data,
-      updatedBy: username,
+      updatedBy: tokenId,
       updatedAt: new Date(),
     });
     await userRepository.save(updatedUserData);

@@ -27,11 +27,11 @@ export class ContactController {
   async update(req: Request, res: Response) {
     const contactId = req.params.id;
     const contactData: TContactUpdateRequest = req.body;
-    const username: string = res.locals.username;
+    const tokenId: string = res.locals.userId;
     const updatedContact = await this.contactService.update(
       contactData,
       contactId,
-      username
+      tokenId
     );
     console.log(updatedContact);
     return res.json(updatedContact);

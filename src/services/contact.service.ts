@@ -99,7 +99,7 @@ export class ContactService {
   async update(
     data: TContactUpdateRequest,
     contactId: string,
-    username: string
+    tokenId: string
   ): Promise<TContact> {
     const contactRepository = AppDataSource.getRepository(Contact);
     const contactToUpdate = await contactRepository.findOneBy({
@@ -133,7 +133,7 @@ export class ContactService {
     const updatedContactData = contactRepository.create({
       ...contactToUpdate,
       ...data,
-      updatedBy: username,
+      updatedBy: tokenId,
       updatedAt: new Date(),
     });
     await contactRepository.save(updatedContactData);
