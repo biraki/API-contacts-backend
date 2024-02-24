@@ -26,7 +26,7 @@ export class SessionService {
     }
 
     const token = sign(
-      { username: foundUser.name, superUser: foundUser.superUser },
+      { username: foundUser.name, superUser: foundUser.superUser, id: foundUser.id },
       process.env.SECRET_KEY!,
       { expiresIn: "3h", subject: foundUser.id,}
     );

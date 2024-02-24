@@ -41,15 +41,15 @@ export class ContactService {
     });
 
     if (foundContactByEmail && foundContactByPhone) {
-      throw new AppError("Email and phone already exist",409);
+      throw new AppError("Email and phone already exist", 409);
     }
 
     if (foundContactByEmail) {
-      throw new AppError("Email already exists",409);
+      throw new AppError("Email already exists", 409);
     }
 
     if (foundContactByPhone) {
-      throw new AppError("Phone already exists",409);
+      throw new AppError("Phone already exists", 409);
     }
 
     const task = contactRepository.create({
@@ -62,7 +62,6 @@ export class ContactService {
   }
 
   async list(userId: string, isSuperUser: boolean): Promise<TContactsResponse> {
-
     if (!isSuperUser) {
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({
@@ -83,9 +82,7 @@ export class ContactService {
     return contactsSchemaResponse.parse(contacts);
   }
 
-  async listById(
-    contactId: string
-  ): Promise<TContact> {
+  async listById(contactId: string): Promise<TContact> {
     const contactRepository = AppDataSource.getRepository(Contact);
     const contactToRetrieve = await contactRepository.findOneBy({
       id: contactId,
@@ -93,7 +90,7 @@ export class ContactService {
     if (!contactToRetrieve) {
       throw new AppError("Contact not found", 404);
     }
-    return contactSchema.parse(contactToRetrieve)
+    return contactSchema.parse(contactToRetrieve);
   }
 
   async update(
@@ -109,27 +106,6 @@ export class ContactService {
       throw new AppError("Contact not found", 404);
     }
 
-    for (var info in data) {
-      if (info == "email") {
-        const foundContact = await contactRepository.findOne({
-          where: {
-            email: data.email!,
-          },
-        });
-        if (foundContact) {
-          throw new AppError("Email already exists",409);
-        }
-      } else if (info == "phone") {
-        const foundContact = await contactRepository.findOne({
-          where: {
-            phone: data.phone!,
-          },
-        });
-        if (foundContact) {
-          throw new AppError("Phone already exists",409);
-        }
-      }
-    }
     const updatedContactData = contactRepository.create({
       ...contactToUpdate,
       ...data,

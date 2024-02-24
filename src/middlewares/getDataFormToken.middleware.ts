@@ -19,9 +19,11 @@ export const getDataFromToken = async (
 
   const superUser = decodedToken.superUser;
   const username = decodedToken.username;
+  const userId = decodedToken.id;
 
   res.locals.username = username;
   res.locals.superUser = superUser;
+  res.locals.userId = userId;
 
   return next();
 };

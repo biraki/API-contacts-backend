@@ -39,12 +39,16 @@ export class UserController {
   }
 
   async generatePdf(req: Request, res: Response) {
+    const userId = res.locals.userId
+    const superUser = res.locals.superUser
+    console.log(userId)
+    console.log(superUser)
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
       "attachment; filename=user_contacts.pdf"
     );
-    const users = await this.userService.getPdf();
+    const users = await this.userService.getPdf(userId, superUser);
     return res.end(users, "binary");
   }
 

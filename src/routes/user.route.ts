@@ -18,7 +18,6 @@ userRouter.get(
   "/pdf/",
   ensureAuthMiddleware,
   getDataFromToken,
-  isSuperUserMiddleware,
   (req, res) => userController.generatePdf(req, res)
 );
 userRouter.get(

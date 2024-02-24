@@ -50,7 +50,7 @@ export class UserService {
       superUser,
       password: hashedPassword,
       phone,
-      contacts:[]
+      contacts: [],
     });
     await userRepository.save(user);
     return userSchemaResponse.parse(user);
@@ -87,7 +87,7 @@ export class UserService {
   ): Promise<TUserUpdateResponse> {
     const userRepository = AppDataSource.getRepository(User);
     const userToUpdate = await userRepository.findOne({
-      where: { id: userId }
+      where: { id: userId },
     });
     if (!userToUpdate) {
       throw new AppError("User not found", 404);
@@ -141,60 +141,123 @@ export class UserService {
     await userRepository.remove(userToDelete);
   }
 
-  async getPdf() {
+  async getPdf(userId: string, superUser: boolean) {
     const userRepository = AppDataSource.getRepository(User);
-    const users = await userRepository.find({
-      relations: {
-        contacts: true,
-      },
-    });
 
-    const pdfDoc = new jsPDF({ orientation: "p" });
+    if (superUser) {
+      const users: User[] = await userRepository.find({
+        relations: {
+          contacts: true,
+        },
+      });
+      const pdfDoc = new jsPDF({ orientation: "p" });
+      let x = 0;
+      let userCount = 0;
+      users.forEach(async (user: User) => {
+        if (userCount != 0 && user.contacts.length > 0) {
+          pdfDoc.addPage();
+        }
+        if (user.contacts.length > 0) {
+          let count = 0;
+          let y = 50;
+          userCount = 0;
+          pdfDoc.setFontSize(10);
+          pdfDoc.setFont("times");
+          pdfDoc.setTextColor("#232020");
+          pdfDoc.text(`Name: ${user?.name}`, 10, 10);
+          pdfDoc.text(`Email: ${user?.email}`, 10, 20);
+          pdfDoc.text(`Phone: ${user?.phone}`, 10, 30);
+          pdfDoc.text(`Contatos:`, 10, 40);
 
-    users.forEach(async (user) => {
-      pdfDoc.addPage();
-      pdfDoc.setFontSize(10);
-      pdfDoc.setFont("times");
-      pdfDoc.setTextColor("#232020");
-      pdfDoc.text(`Name: ${user?.name}`, 10, 10);
-      pdfDoc.text(`Email: ${user?.email}`, 10, 20);
-      pdfDoc.text(`Phone: ${user?.phone}`, 10, 30);
-      pdfDoc.text(`Contatos:`, 10, 40);
-      let y = 50;
-      let count = 0;
-      user?.contacts.map((contact) => {
-        for (const [key, value] of Object.entries(contact)) {
-          if (count == 6) {
-            pdfDoc.addPage();
-            count = -1;
-            y = 10;
-          }
-          if (
-            key == "name" ||
-            key == "phone" ||
-            key == "optionalPhone" ||
-            key == "email" ||
-            key == "optionalEmail" ||
-            key == "status"
-          ) {
-            pdfDoc.text(`${key}: ${value}`, 10, y);
-            y += 5;
-            if (key == "status") {
-              y += 10;
+          user?.contacts.map((contact) => {
+            for (const [key, value] of Object.entries(contact)) {
+              if (count == 6) {
+                pdfDoc.addPage();
+                count = -1;
+                y = 10;
+              }
+              if (
+                key == "name" ||
+                key == "phone" ||
+                key == "optionalPhone" ||
+                key == "email" ||
+                key == "optionalEmail" ||
+                key == "status"
+              ) {
+                pdfDoc.text(`${key}: ${value}`, 30, y);
+                y += 5;
+                if (key == "status") {
+                  y += 10;
+                }
+              }
+            }
+
+            count += 1;
+          });
+          pdfDoc.addPage();
+          x = 0;
+        }
+        if (userCount > 5) {
+          x = 0;
+          userCount = 0;
+          pdfDoc.addPage();
+        }
+        pdfDoc.setFontSize(10);
+        pdfDoc.setFont("times");
+        pdfDoc.setTextColor("#232020");
+        pdfDoc.text(`Name: ${user?.name}`, 10, x + 10);
+        pdfDoc.text(`Email: ${user?.email}`, 10, x + 20);
+        pdfDoc.text(`Phone: ${user?.phone}`, 10, x + 30);
+        pdfDoc.text(`Contatos:`, 10, x + 40);
+        x = x + 40;
+        userCount += 1;
+      });
+      const pdfBytes = pdfDoc.output("arraybuffer");
+      const pdf = new Blob([pdfBytes], { type: "application/pdf" });
+  
+      return await pdf.text();
+    } else {
+      const user: User | null= await userRepository.findOne({
+        where: {
+          id: userId,
+        },
+        relations: {
+          contacts: true,
+        },
+      });
+      const pdfDoc = new jsPDF({ orientation: "p" });
+        let y = 20;
+        let count = 0;
+        user?.contacts.map((contact) => {
+          for (const [key, value] of Object.entries(contact)) {
+            if (count == 6) {
+              pdfDoc.addPage();
+              count = -1;
+              y = 20;
+            }
+            if (
+              key == "name" ||
+              key == "phone" ||
+              key == "optionalPhone" ||
+              key == "email" ||
+              key == "optionalEmail" ||
+              key == "status"
+            ) {
+              pdfDoc.text(`${key}: ${value}`, 10, y);
+              y += 5;
+              if (key == "status") {
+                y += 10;
+              }
             }
           }
-        }
-
-        count += 1;
-      });
-
-      // Converte o documento PDF para bytes
-    });
-    pdfDoc.deletePage(1);
-    const pdfBytes = pdfDoc.output("arraybuffer");
-    const pdf = new Blob([pdfBytes], { type: "application/pdf" });
-
-    return await pdf.text();
+  
+          count += 1;
+        });
+        const pdfBytes = pdfDoc.output("arraybuffer");
+        const pdf = new Blob([pdfBytes], { type: "application/pdf" });
+    
+        return await pdf.text();
+    }
   }
 
   async getPdfById(userId: string) {

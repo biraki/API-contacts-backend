@@ -6,7 +6,7 @@ const userSchema = z.object({
   email: z.string().email(),
   name: z.string(),
   password: z.string(),
-  superUser: z.boolean(),
+  superUser: z.boolean().default(false),
   phone: z.string(),
   createdAt: z.date(),
   updatedAt: z.date().nullable(),
@@ -20,7 +20,7 @@ const userSchemaRequest = userSchema.omit({
   registeredAt: true,
   updatedAt: true,
   updatedBy: true,
-  contacts:true
+  contacts:true,
 });
 
 const userSchemaResponse = userSchema.omit({
