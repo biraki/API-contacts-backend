@@ -27,31 +27,7 @@ export class ContactService {
     if (!user) {
       throw new AppError("User not found", 404);
     }
-
-    const foundContactByEmail = await contactRepository.findOne({
-      where: {
-        email: data.email,
-      },
-    });
-
-    const foundContactByPhone = await contactRepository.findOne({
-      where: {
-        phone: data.phone,
-      },
-    });
-
-    if (foundContactByEmail && foundContactByPhone) {
-      throw new AppError("Email and phone already exist", 409);
-    }
-
-    if (foundContactByEmail) {
-      throw new AppError("Email already exists", 409);
-    }
-
-    if (foundContactByPhone) {
-      throw new AppError("Phone already exists", 409);
-    }
-
+    
     const task = contactRepository.create({
       ...data,
       user,

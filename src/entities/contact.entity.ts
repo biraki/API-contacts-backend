@@ -22,13 +22,13 @@ export class Contact {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column()
   phone: string;
 
   @Column({ nullable: true, type: "varchar" })
   optionalPhone: string | null | undefined;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column({ nullable: true, type: "varchar" })
