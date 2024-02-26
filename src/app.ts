@@ -20,6 +20,6 @@ app.use("/users", userRouter)
 app.use("/login", sessionRouter)
 app.use("/contacts", contactRouter)
 app.use("/password", passwordRouter)
-// app.use(handleAppErrorMiddlieware)
+app.use(handleAppErrorMiddlieware)
 
 export default app
