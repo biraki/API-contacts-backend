@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { userSchema, userSchemaRecoverPassword, userSchemaRequest, userSchemaResponse, userSchemaUpdate, userSchemaUpdateResponse, usersSchemaResponse } from "../schemas/user.schema"
+import { userSchema, userSchemaRequest, userSchemaResponse, userSchemaUpdate, userSchemaUpdateResponse, usersSchemaResponse } from "../schemas/user.schema"
 import { DeepPartial } from "typeorm"
 
 type TUserRequest = z.infer<typeof userSchemaRequest>
@@ -8,6 +8,5 @@ type TUserResponse = z.infer<typeof userSchemaResponse>
 type TUsersResponse = z.infer<typeof usersSchemaResponse>
 type TUserUpdateResponse = z.infer<typeof userSchemaUpdateResponse>
 type TUserUpdateRequest = DeepPartial<TUserRequest>
-type TUserRecoveryPasswordRequest = z.infer<typeof userSchemaRecoverPassword>
 
-export { TUser, TUserRequest, TUserResponse, TUsersResponse, TUserUpdateRequest, TUserRecoveryPasswordRequest, TUserUpdateResponse }
+export { TUser, TUserRequest, TUserResponse, TUsersResponse, TUserUpdateRequest, TUserUpdateResponse }

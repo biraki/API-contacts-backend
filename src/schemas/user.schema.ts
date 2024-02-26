@@ -44,24 +44,11 @@ const userSchemaUpdate = userSchema
       contacts: true,
     })
 
-
-
-  const userSchemaRecoverPassword = userSchema.omit({
-    id: true,
-    password: true,
-    superUser: true,
-    phone: true,
-    createdAt: true,
-    updatedAt: true,
-    updatedBy: true
-  })
-
 export {
   userSchema,
   userSchemaRequest,
   userSchemaResponse,
   usersSchemaResponse,
   userSchemaUpdate,
-  userSchemaRecoverPassword,
   userSchemaUpdateResponse
 };
