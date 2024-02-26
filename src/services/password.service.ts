@@ -71,10 +71,15 @@ export class RecoverPasswordService {
         user: true ,
       }
     });
-    const userId = foundResetPassword?.user.id;
+    console.log(foundResetPassword)
+    if(foundResetPassword == null){
+      throw new AppError("Contact not found", 404);
+    }
+
+    const userId = foundResetPassword.user.id;
     const foundUser = await userRepository.findOne({
       where: {
-        id: userId!,
+        id: userId,
       },
     });
     const hashedPassword = await hash(newPassword, 10);
