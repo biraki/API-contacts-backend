@@ -1,4 +1,3 @@
-import { DeepPartial } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { Contact } from "../entities/contact.entity";
 import { User } from "../entities/users.entity";

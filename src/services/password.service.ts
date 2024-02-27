@@ -4,7 +4,6 @@ import { AppDataSource } from "../data-source";
 import { User } from "../entities/users.entity";
 import { AppError } from "../errors/AppError";
 import { ResetPassword } from "../entities/resetPassword.entity";
-import { TResePasswordRequest } from "../interfaces/resetPassword.interface";
 import { hash } from "bcryptjs";
 
 const transporter = nodemailer.createTransport({
